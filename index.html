@@ -13,7 +13,7 @@
         <p class="eyebrow">Traffic Management Dashboard</p>
         <h1>🚦 Smart Traffic Intersection Simulator</h1>
       </div>
-      <div class="status-chip">Manual + Timed + Pedestrian Logic</div>
+      <div class="status-chip">Manual + Timed + Pedestrian + Timer</div>
     </header>
 
     <main class="dashboard-grid">
@@ -32,6 +32,7 @@
                 <h3>North–South</h3>
                 <p>Main Lane</p>
               </div>
+              <div class="lane-timer" id="ns-countdown">-</div>
             </div>
 
             <div class="traffic-light vertical" id="ns-light">
@@ -48,6 +49,8 @@
             <div class="walk-label">Pedestrian</div>
             <div class="walk-status" id="pedestrian-status">DON'T WALK</div>
 
+            <div class="ped-timer" id="pedestrian-countdown">-</div>
+
           </article>
 
           <article class="lane-card">
@@ -56,6 +59,7 @@
                 <h3>East–West</h3>
                 <p>Intersecting Lane</p>
               </div>
+              <div class="lane-timer" id="ew-countdown">-</div>
             </div>
 
             <div class="traffic-light vertical" id="ew-light">

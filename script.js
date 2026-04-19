@@ -16,26 +16,25 @@ const ewLights = {
 
 const nsStateText = $('ns-state-text');
 const ewStateText = $('ew-state-text');
-<<<<<<< HEAD
-=======
+
 const pedestrianStatus = $('pedestrian-status');
->>>>>>> pedestrian-logic
+
+
+const nsCountdown = $('ns-countdown');
+const ewCountdown = $('ew-countdown');
+const pedestrianCountdown = $('pedestrian-countdown');
 
 const btnTransition = $('btn-transition');
 const btnStartTimed = $('btn-start-timed');
 const btnStopTimed = $('btn-stop-timed');
-<<<<<<< HEAD
 
-const nsTimeInput = $('ns-time');
-const ewTimeInput = $('ew-time');
-=======
 const btnPedestrian = $('btn-pedestrian');
 
 const nsTimeInput = $('ns-time');
 const ewTimeInput = $('ew-time');
 const pedQueueInput = $('ped-queue');
 const pedWalkInput = $('ped-walk');
->>>>>>> pedestrian-logic
+
 
 const modeSlider = $('mode-slider');
 const manualControls = $('manual-controls');
@@ -43,6 +42,8 @@ const timedControls = $('timed-controls');
 
 const logContainer = $('log-container');
 const btnClearLog = $('btn-clear-log');
+const labelManual = $('label-manual');
+const labelTimed = $('label-timed');
 
 const State = {
   ns: 'stop',
@@ -51,19 +52,23 @@ const State = {
 
   transitioning: false,
   transitionTimeout: null,
+  transitionInterval: null,
+
   timedTimeout: null,
   timedRunning: false,
 
-<<<<<<< HEAD
-=======
+
   pedestrianActive: false,
   pedestrianQueued: false,
   pedestrianQueueTimeout: null,
+  pedestrianQueueInterval: null,
   pedestrianWalkTimeout: null,
+  pedestrianWalkInterval: null,
   pedestrianWarnTimeout: null,
+  pedestrianWarnInterval: null,
 
   resumeLane: null,
->>>>>>> pedestrian-logic
+
   lastNsSeconds: 10,
   lastEwSeconds: 7,
 };
@@ -72,10 +77,15 @@ function log(message, type = 'info') {
   const entry = document.createElement('div');
   entry.className = 'log-entry ' + type;
 
-  const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-  entry.innerHTML = `<span class="log-time">[${time}]</span>${message}`;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
 
+  entry.innerHTML = `<span class="log-time">[${timeStr}]</span>${message}`;
   logContainer.prepend(entry);
+
+  while (logContainer.children.length > 80) {
+    logContainer.removeChild(logContainer.lastChild);
+  }
 }
 
 function renderLight(lights, stateText, state) {
@@ -103,23 +113,41 @@ function renderAll() {
   renderLight(ewLights, ewStateText, State.ew);
 }
 
-<<<<<<< HEAD
-function clearAllTimeouts() {
-  clearTimeout(State.timedTimeout);
-  clearTimeout(State.transitionTimeout);
 
-  State.timedTimeout = null;
-  State.transitionTimeout = null;
-=======
-function setPedestrianStatus(text, color, flash = false) {
+function setPedestrianStatus(text, color = '#ef4444', flashing = false) {
   pedestrianStatus.textContent = text;
   pedestrianStatus.style.color = color;
 
-  if (flash) {
+  if (flashing) {
     pedestrianStatus.classList.add('flash');
   } else {
     pedestrianStatus.classList.remove('flash');
   }
+}
+
+function setTimerState(el, state) {
+  el.classList.remove('go', 'stop', 'warning');
+  el.classList.add(state);
+}
+
+function setLaneCountdowns(nsValue = '-', ewValue = '-', nsState = 'stop', ewState = 'stop') {
+  if (State.mode !== 'timed' && State.ns !== 'warning' && State.ew !== 'warning') {
+    nsCountdown.textContent = '-';
+    ewCountdown.textContent = '-';
+    setTimerState(nsCountdown, 'stop');
+    setTimerState(ewCountdown, 'stop');
+    return;
+  }
+
+  nsCountdown.textContent = nsValue;
+  ewCountdown.textContent = ewValue;
+  setTimerState(nsCountdown, nsState);
+  setTimerState(ewCountdown, ewState);
+}
+
+function setPedCountdown(value = '-', state = 'stop') {
+  pedestrianCountdown.textContent = value;
+  setTimerState(pedestrianCountdown, state);
 }
 
 function clearAllTimeouts() {
@@ -129,12 +157,21 @@ function clearAllTimeouts() {
   clearTimeout(State.pedestrianWalkTimeout);
   clearTimeout(State.pedestrianWarnTimeout);
 
+  clearInterval(State.transitionInterval);
+  clearInterval(State.pedestrianQueueInterval);
+  clearInterval(State.pedestrianWalkInterval);
+  clearInterval(State.pedestrianWarnInterval);
+
   State.timedTimeout = null;
   State.transitionTimeout = null;
   State.pedestrianQueueTimeout = null;
   State.pedestrianWalkTimeout = null;
   State.pedestrianWarnTimeout = null;
->>>>>>> pedestrian-logic
+
+  State.transitionInterval = null;
+  State.pedestrianQueueInterval = null;
+  State.pedestrianWalkInterval = null;
+  State.pedestrianWarnInterval = null;
 }
 
 function runManualTransition(callback) {
@@ -143,6 +180,7 @@ function runManualTransition(callback) {
   State.transitioning = true;
 
   const nsActive = State.ns === 'go';
+  let remaining = 3;
 
   if (nsActive) {
     State.ns = 'warning';
@@ -154,7 +192,28 @@ function runManualTransition(callback) {
 
   renderAll();
 
+  function updateWarningCountdown() {
+    if (nsActive) {
+      setLaneCountdowns(remaining, remaining, 'warning', 'stop');
+    } else {
+      setLaneCountdowns(remaining, remaining, 'stop', 'warning');
+    }
+  }
+
+  updateWarningCountdown();
+
+  State.transitionInterval = setInterval(function () {
+    remaining--;
+
+    if (remaining > 0) {
+      updateWarningCountdown();
+    }
+  }, 1000);
+
   State.transitionTimeout = setTimeout(function () {
+    clearInterval(State.transitionInterval);
+    State.transitionInterval = null;
+
     if (nsActive) {
       State.ns = 'stop';
       State.ew = 'go';
@@ -166,10 +225,17 @@ function runManualTransition(callback) {
     }
 
     renderAll();
+
+    if (State.mode !== 'timed') {
+      setLaneCountdowns('-', '-', 'stop', 'stop');
+    }
+
     State.transitioning = false;
     State.transitionTimeout = null;
 
-    if (callback) callback();
+    if (typeof callback === 'function') {
+      callback();
+    }
   }, 3000);
 }
 
@@ -186,11 +252,11 @@ function startTimedMode() {
   State.ew = 'stop';
   renderAll();
 
-<<<<<<< HEAD
-=======
-  setPedestrianStatus("DON'T WALK", '#ef4444', false);
 
->>>>>>> pedestrian-logic
+  setPedestrianStatus("DON'T WALK", '#ef4444', false);
+  setPedCountdown('-', 'stop');
+  setLaneCountdowns(nsSeconds, nsSeconds + 3, 'go', 'stop');
+
   log(`⏱ Timed mode started — N–S: ${nsSeconds}s | E–W: ${ewSeconds}s`, 'info');
   log('✅ N–S is GO — E–W is STOP', 'success');
 
@@ -199,23 +265,40 @@ function startTimedMode() {
 
 function runTimedCycle(nsSeconds, ewSeconds) {
   if (State.mode !== 'timed') return;
-<<<<<<< HEAD
-=======
   if (State.pedestrianActive || State.pedestrianQueued) return;
->>>>>>> pedestrian-logic
   if (!State.timedRunning) return;
 
-  const currentGoTime = State.ns === 'go' ? nsSeconds : ewSeconds;
+  const nsActive = State.ns === 'go';
+  let activeRemaining = nsActive ? nsSeconds : ewSeconds;
+  let stopRemaining = activeRemaining + 3;
 
-  State.timedTimeout = setTimeout(function () {
+  function tick() {
+    if (State.mode !== 'timed') return;
+    if (State.pedestrianActive || State.pedestrianQueued) return;
+    if (!State.timedRunning) return;
+
+    if (activeRemaining > 0) {
+      if (nsActive) {
+        setLaneCountdowns(activeRemaining, stopRemaining, 'go', 'stop');
+      } else {
+        setLaneCountdowns(stopRemaining, activeRemaining, 'stop', 'go');
+      }
+
+      activeRemaining--;
+      stopRemaining--;
+
+      State.timedTimeout = setTimeout(tick, 1000);
+      return;
+    }
+
     runManualTransition(function () {
       runTimedCycle(nsSeconds, ewSeconds);
     });
-  }, currentGoTime * 1000);
+  }
+
+  tick();
 }
 
-<<<<<<< HEAD
-=======
 function startPedestrianMode() {
   if (State.mode !== 'timed') return;
 
@@ -241,40 +324,90 @@ function startPedestrianMode() {
 
   setPedestrianStatus("DON'T WALK", '#ef4444', false);
 
+  let queueRemaining = queueSec;
+  setPedCountdown(queueRemaining, 'stop');
+
+  State.pedestrianQueueInterval = setInterval(function () {
+    queueRemaining--;
+
+    if (queueRemaining > 0) {
+      setPedCountdown(queueRemaining, 'stop');
+    }
+  }, 1000);
+
   State.pedestrianQueueTimeout = setTimeout(function () {
+    clearInterval(State.pedestrianQueueInterval);
+    State.pedestrianQueueInterval = null;
+
     State.pedestrianQueued = false;
     State.pedestrianActive = true;
 
     clearTimeout(State.timedTimeout);
     clearTimeout(State.transitionTimeout);
+    clearInterval(State.transitionInterval);
 
     State.timedTimeout = null;
     State.transitionTimeout = null;
+    State.transitionInterval = null;
     State.transitioning = false;
 
     State.ns = 'stop';
     State.ew = 'stop';
     renderAll();
+    setLaneCountdowns(walkSec + walkSec, walkSec + walkSec, 'stop', 'stop');
 
     setPedestrianStatus('WALK', '#22c55e', false);
+    setPedCountdown(walkSec, 'go');
     log(`🚶 WALK signal active — pedestrians may cross for ${walkSec} seconds`, 'success');
 
+    let walkRemaining = walkSec;
+
+    State.pedestrianWalkInterval = setInterval(function () {
+      walkRemaining--;
+
+      if (walkRemaining > 0) {
+        setPedCountdown(walkRemaining, 'go');
+        setLaneCountdowns(walkRemaining + walkSec, walkRemaining + walkSec, 'stop', 'stop');
+      }
+    }, 1000);
+
     State.pedestrianWalkTimeout = setTimeout(function () {
+      clearInterval(State.pedestrianWalkInterval);
+      State.pedestrianWalkInterval = null;
+
       setPedestrianStatus('WALK FAST', '#f59e0b', true);
+      setPedCountdown(walkSec, 'warning');
       log(`⚠ WALK FAST — ${walkSec} seconds remaining warning phase`, 'warning');
 
+      let warnRemaining = walkSec;
+
+      State.pedestrianWarnInterval = setInterval(function () {
+        warnRemaining--;
+
+        if (warnRemaining > 0) {
+          setPedCountdown(warnRemaining, 'warning');
+          setLaneCountdowns(warnRemaining, warnRemaining, 'stop', 'stop');
+        }
+      }, 1000);
+
       State.pedestrianWarnTimeout = setTimeout(function () {
+        clearInterval(State.pedestrianWarnInterval);
+        State.pedestrianWarnInterval = null;
+
         State.pedestrianActive = false;
         setPedestrianStatus("DON'T WALK", '#ef4444', false);
+        setPedCountdown('-', 'stop');
 
         if (State.resumeLane === 'ns') {
           State.ns = 'go';
           State.ew = 'stop';
           log('✅ Resuming N–S after pedestrian', 'success');
+          setLaneCountdowns(State.lastNsSeconds, State.lastNsSeconds + 3, 'go', 'stop');
         } else {
           State.ew = 'go';
           State.ns = 'stop';
           log('✅ Resuming E–W after pedestrian', 'success');
+          setLaneCountdowns(State.lastEwSeconds + 3, State.lastEwSeconds, 'stop', 'go');
         }
 
         renderAll();
@@ -284,22 +417,18 @@ function startPedestrianMode() {
   }, queueSec * 1000);
 }
 
->>>>>>> pedestrian-logic
 function stopTimedMode() {
   clearAllTimeouts();
 
   State.timedRunning = false;
-<<<<<<< HEAD
-  State.transitioning = false;
-
-=======
   State.pedestrianActive = false;
   State.pedestrianQueued = false;
   State.transitioning = false;
 
   setPedestrianStatus("DON'T WALK", '#ef4444', false);
+  setPedCountdown('-', 'stop');
+  setLaneCountdowns('-', '-', 'stop', 'stop');
 
->>>>>>> pedestrian-logic
   log('⏹ Timed mode stopped', 'warning');
 }
 
@@ -317,16 +446,20 @@ btnStartTimed.onclick = () => {
 
 btnStopTimed.onclick = () => stopTimedMode();
 
-<<<<<<< HEAD
-=======
 btnPedestrian.onclick = () => startPedestrianMode();
 
->>>>>>> pedestrian-logic
 modeSlider.oninput = () => {
   if (modeSlider.value === '0') {
     State.mode = 'manual';
     manualControls.classList.remove('hidden');
     timedControls.classList.add('hidden');
+
+    clearAllTimeouts();
+    State.timedRunning = false;
+    State.transitioning = false;
+
+    setLaneCountdowns('-', '-', 'stop', 'stop');
+    setPedCountdown('-', 'stop');
   } else {
     State.mode = 'timed';
     manualControls.classList.add('hidden');
@@ -339,9 +472,11 @@ btnClearLog.onclick = () => {
 };
 
 renderAll();
-<<<<<<< HEAD
-=======
+
 setPedestrianStatus("DON'T WALK", '#ef4444', false);
->>>>>>> pedestrian-logic
+setLaneCountdowns('-', '-', 'stop', 'stop');
+setPedestrianStatus("DON'T WALK", '#ef4444', false);
+setPedCountdown('-', 'stop');
+
 log('🚦 Traffic Simulator initialized', 'info');
 log('✅ E–W is GO — N–S is STOP', 'success');

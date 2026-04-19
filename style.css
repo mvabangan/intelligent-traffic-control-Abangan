@@ -76,11 +76,8 @@ body {
 .log-card,
 .control-card,
 .lane-card,
-<<<<<<< HEAD
-.center-card {
-=======
+
 .pedestrian-card {
->>>>>>> pedestrian-logic
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -99,11 +96,7 @@ body {
   margin-bottom: 18px;
 }
 
-<<<<<<< HEAD
-.main-stage {
-=======
 .pedestrian-stage {
->>>>>>> pedestrian-logic
   display: grid;
   grid-template-columns: 1fr 180px 1fr;
   gap: 18px;
@@ -112,11 +105,7 @@ body {
 }
 
 .lane-card,
-<<<<<<< HEAD
-.center-card {
-=======
 .pedestrian-card {
->>>>>>> pedestrian-logic
   padding: 18px;
 }
 
@@ -130,6 +119,22 @@ body {
 .lane-header p {
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.lane-timer,
+.ped-timer {
+  min-width: 62px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: #0d1323;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #d7def6;
 }
 
 .traffic-light.vertical {
@@ -176,11 +181,8 @@ body {
   letter-spacing: 0.08em;
 }
 
-<<<<<<< HEAD
-.center-card {
-=======
 .pedestrian-card {
->>>>>>> pedestrian-logic
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -189,11 +191,7 @@ body {
   text-align: center;
 }
 
-<<<<<<< HEAD
-.center-symbol {
-=======
 .walk-icon {
->>>>>>> pedestrian-logic
   width: 100px;
   height: 100px;
   border-radius: 24px;
@@ -205,19 +203,13 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
 }
 
-<<<<<<< HEAD
-.center-label {
-=======
 .walk-label {
->>>>>>> pedestrian-logic
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.76rem;
 }
 
-<<<<<<< HEAD
-=======
 .walk-status {
   padding: 10px 14px;
   border-radius: 14px;
@@ -236,12 +228,8 @@ body {
 }
 
 @keyframes flashWarn {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
 }
 
 >>>>>>> pedestrian-logic
@@ -327,10 +315,8 @@ body {
 .btn-primary { background: var(--blue); color: white; }
 .btn-success { background: var(--green); color: #08120c; }
 .btn-danger { background: var(--red); color: white; }
-<<<<<<< HEAD
-=======
+
 .btn-warning { background: #f59e0b; color: #1d1302; }
->>>>>>> pedestrian-logic
 .btn-ghost { background: #202943; color: #d7def6; }
 
 .hidden {
@@ -369,11 +355,22 @@ body {
     grid-template-columns: 1fr;
   }
 
-<<<<<<< HEAD
-  .main-stage {
-=======
   .pedestrian-stage {
->>>>>>> pedestrian-logic
     grid-template-columns: 1fr;
   }
+}
+
+.lane-timer.go,
+.ped-timer.go {
+  color: #22c55e;
+}
+
+.lane-timer.stop,
+.ped-timer.stop {
+  color: #ef4444;
+}
+
+.lane-timer.warning,
+.ped-timer.warning {
+  color: #f59e0b;
 }
