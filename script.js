@@ -19,7 +19,6 @@ const ewStateText = $('ew-state-text');
 
 const pedestrianStatus = $('pedestrian-status');
 
-
 const nsCountdown = $('ns-countdown');
 const ewCountdown = $('ew-countdown');
 const pedestrianCountdown = $('pedestrian-countdown');
@@ -27,14 +26,12 @@ const pedestrianCountdown = $('pedestrian-countdown');
 const btnTransition = $('btn-transition');
 const btnStartTimed = $('btn-start-timed');
 const btnStopTimed = $('btn-stop-timed');
-
 const btnPedestrian = $('btn-pedestrian');
 
 const nsTimeInput = $('ns-time');
 const ewTimeInput = $('ew-time');
 const pedQueueInput = $('ped-queue');
 const pedWalkInput = $('ped-walk');
-
 
 const modeSlider = $('mode-slider');
 const manualControls = $('manual-controls');
@@ -57,7 +54,6 @@ const State = {
   timedTimeout: null,
   timedRunning: false,
 
-
   pedestrianActive: false,
   pedestrianQueued: false,
   pedestrianQueueTimeout: null,
@@ -72,6 +68,30 @@ const State = {
   lastNsSeconds: 10,
   lastEwSeconds: 7,
 };
+
+const saved = JSON.parse(localStorage.getItem('trafficState'));
+
+if (saved) {
+  State.ns = saved.ns || State.ns;
+  State.ew = saved.ew || State.ew;
+  State.mode = saved.mode || State.mode;
+  State.lastNsSeconds = saved.lastNsSeconds || State.lastNsSeconds;
+  State.lastEwSeconds = saved.lastEwSeconds || State.lastEwSeconds;
+}
+
+function saveState() {
+  localStorage.setItem('trafficState', JSON.stringify({
+    ns: State.ns,
+    ew: State.ew,
+    mode: State.mode,
+    lastNsSeconds: State.lastNsSeconds,
+    lastEwSeconds: State.lastEwSeconds,
+    nsTime: nsTimeInput.value,
+    ewTime: ewTimeInput.value,
+    pedQueue: pedQueueInput.value,
+    pedWalk: pedWalkInput.value
+  }));
+}
 
 function log(message, type = 'info') {
   const entry = document.createElement('div');
@@ -112,7 +132,6 @@ function renderAll() {
   renderLight(nsLights, nsStateText, State.ns);
   renderLight(ewLights, ewStateText, State.ew);
 }
-
 
 function setPedestrianStatus(text, color = '#ef4444', flashing = false) {
   pedestrianStatus.textContent = text;
@@ -191,6 +210,7 @@ function runManualTransition(callback) {
   }
 
   renderAll();
+  saveState();
 
   function updateWarningCountdown() {
     if (nsActive) {
@@ -225,6 +245,7 @@ function runManualTransition(callback) {
     }
 
     renderAll();
+    saveState();
 
     if (State.mode !== 'timed') {
       setLaneCountdowns('-', '-', 'stop', 'stop');
@@ -251,7 +272,7 @@ function startTimedMode() {
   State.ns = 'go';
   State.ew = 'stop';
   renderAll();
-
+  saveState();
 
   setPedestrianStatus("DON'T WALK", '#ef4444', false);
   setPedCountdown('-', 'stop');
@@ -354,6 +375,7 @@ function startPedestrianMode() {
     State.ns = 'stop';
     State.ew = 'stop';
     renderAll();
+    saveState();
     setLaneCountdowns(walkSec + walkSec, walkSec + walkSec, 'stop', 'stop');
 
     setPedestrianStatus('WALK', '#22c55e', false);
@@ -411,6 +433,7 @@ function startPedestrianMode() {
         }
 
         renderAll();
+        saveState();
         runTimedCycle(State.lastNsSeconds, State.lastEwSeconds);
       }, walkSec * 1000);
     }, walkSec * 1000);
@@ -430,6 +453,7 @@ function stopTimedMode() {
   setLaneCountdowns('-', '-', 'stop', 'stop');
 
   log('⏹ Timed mode stopped', 'warning');
+  saveState();
 }
 
 btnTransition.onclick = () => runManualTransition();
@@ -465,13 +489,26 @@ modeSlider.oninput = () => {
     manualControls.classList.add('hidden');
     timedControls.classList.remove('hidden');
   }
+
+  saveState();
 };
 
 btnClearLog.onclick = () => {
   logContainer.innerHTML = '';
 };
 
+nsTimeInput.value = saved?.nsTime || nsTimeInput.value;
+ewTimeInput.value = saved?.ewTime || ewTimeInput.value;
+pedQueueInput.value = saved?.pedQueue || pedQueueInput.value;
+pedWalkInput.value = saved?.pedWalk || pedWalkInput.value;
+
 renderAll();
+
+if (State.mode === 'timed') {
+  modeSlider.value = '1';
+  manualControls.classList.add('hidden');
+  timedControls.classList.remove('hidden');
+}
 
 setPedestrianStatus("DON'T WALK", '#ef4444', false);
 setLaneCountdowns('-', '-', 'stop', 'stop');
