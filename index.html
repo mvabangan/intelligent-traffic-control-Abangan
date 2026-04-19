@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Traffic Intersection Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Traffic Management Dashboard</p>
+        <h1>🚦 Smart Traffic Intersection Simulator</h1>
+      </div>
+      <div class="status-chip">Manual + Timed + Pedestrian Logic</div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="visual-card">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Simulation</p>
+            <h2>Intersection Control</h2>
+          </div>
+        </div>
+
+        <div class="intersection-stage pedestrian-stage">
+          <article class="lane-card">
+            <div class="lane-header">
+              <div>
+                <h3>North–South</h3>
+                <p>Main Lane</p>
+              </div>
+            </div>
+
+            <div class="traffic-light vertical" id="ns-light">
+              <div class="light red" id="ns-red"></div>
+              <div class="light yellow" id="ns-yellow"></div>
+              <div class="light green" id="ns-green"></div>
+            </div>
+
+            <div class="lane-state" id="ns-state-text">STOP</div>
+          </article>
+
+          <article class="pedestrian-card">
+            <div class="walk-icon">🚶</div>
+            <div class="walk-label">Pedestrian</div>
+            <div class="walk-status" id="pedestrian-status">DON'T WALK</div>
+          </article>
+
+          <article class="lane-card">
+            <div class="lane-header">
+              <div>
+                <h3>East–West</h3>
+                <p>Intersecting Lane</p>
+              </div>
+            </div>
+
+            <div class="traffic-light vertical" id="ew-light">
+              <div class="light red" id="ew-red"></div>
+              <div class="light yellow" id="ew-yellow"></div>
+              <div class="light green" id="ew-green"></div>
+            </div>
+
+            <div class="lane-state" id="ew-state-text">GO</div>
+          </article>
+        </div>
+
+        <section class="control-card">
+          <div class="control-top">
+            <span class="mode-label active-label" id="label-manual">Manual</span>
+            <input
+              type="range"
+              class="mode-slider"
+              id="mode-slider"
+              min="0"
+              max="1"
+              step="1"
+              value="0"
+              aria-label="Switch between manual and timed mode"
+            />
+            <span class="mode-label" id="label-timed">Timed</span>
+          </div>
+
+          <div id="manual-controls" class="control-panel-row">
+            <button class="btn btn-primary" id="btn-transition">Trigger Transition</button>
+          </div>
+
+          <div id="timed-controls" class="control-panel-stack hidden">
+            <div class="control-panel-row">
+              <label class="field">
+                <span>N–S Go Time</span>
+                <input type="text" id="ns-time" value="10" placeholder="10" />
+              </label>
+
+              <label class="field">
+                <span>E–W Go Time</span>
+                <input type="text" id="ew-time" value="7" placeholder="7" />
+              </label>
+
+              <button class="btn btn-success" id="btn-start-timed">Start</button>
+              <button class="btn btn-danger" id="btn-stop-timed">Stop</button>
+            </div>
+
+            <div class="control-panel-row pedestrian-controls">
+              <label class="field">
+                <span>Queue (sec)</span>
+                <input type="text" id="ped-queue" value="3" placeholder="3" />
+              </label>
+
+              <label class="field">
+                <span>Walk (sec)</span>
+                <input type="text" id="ped-walk" value="3" placeholder="3" />
+              </label>
+
+              <button class="btn btn-warning" id="btn-pedestrian">Pedestrian</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="log-card">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">System</p>
+            <h2>Event Logs</h2>
+          </div>
+          <button class="btn btn-ghost" id="btn-clear-log">Clear</button>
+        </div>
+        <div id="log-container" class="log-list"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
