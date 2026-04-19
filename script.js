@@ -475,7 +475,6 @@ renderAll();
 
 setPedestrianStatus("DON'T WALK", '#ef4444', false);
 setLaneCountdowns('-', '-', 'stop', 'stop');
-setPedestrianStatus("DON'T WALK", '#ef4444', false);
 setPedCountdown('-', 'stop');
 
 log('🚦 Traffic Simulator initialized', 'info');
