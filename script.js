@@ -16,13 +16,26 @@ const ewLights = {
 
 const nsStateText = $('ns-state-text');
 const ewStateText = $('ew-state-text');
+<<<<<<< HEAD
+=======
+const pedestrianStatus = $('pedestrian-status');
+>>>>>>> pedestrian-logic
 
 const btnTransition = $('btn-transition');
 const btnStartTimed = $('btn-start-timed');
 const btnStopTimed = $('btn-stop-timed');
+<<<<<<< HEAD
 
 const nsTimeInput = $('ns-time');
 const ewTimeInput = $('ew-time');
+=======
+const btnPedestrian = $('btn-pedestrian');
+
+const nsTimeInput = $('ns-time');
+const ewTimeInput = $('ew-time');
+const pedQueueInput = $('ped-queue');
+const pedWalkInput = $('ped-walk');
+>>>>>>> pedestrian-logic
 
 const modeSlider = $('mode-slider');
 const manualControls = $('manual-controls');
@@ -41,6 +54,16 @@ const State = {
   timedTimeout: null,
   timedRunning: false,
 
+<<<<<<< HEAD
+=======
+  pedestrianActive: false,
+  pedestrianQueued: false,
+  pedestrianQueueTimeout: null,
+  pedestrianWalkTimeout: null,
+  pedestrianWarnTimeout: null,
+
+  resumeLane: null,
+>>>>>>> pedestrian-logic
   lastNsSeconds: 10,
   lastEwSeconds: 7,
 };
@@ -80,12 +103,38 @@ function renderAll() {
   renderLight(ewLights, ewStateText, State.ew);
 }
 
+<<<<<<< HEAD
 function clearAllTimeouts() {
   clearTimeout(State.timedTimeout);
   clearTimeout(State.transitionTimeout);
 
   State.timedTimeout = null;
   State.transitionTimeout = null;
+=======
+function setPedestrianStatus(text, color, flash = false) {
+  pedestrianStatus.textContent = text;
+  pedestrianStatus.style.color = color;
+
+  if (flash) {
+    pedestrianStatus.classList.add('flash');
+  } else {
+    pedestrianStatus.classList.remove('flash');
+  }
+}
+
+function clearAllTimeouts() {
+  clearTimeout(State.timedTimeout);
+  clearTimeout(State.transitionTimeout);
+  clearTimeout(State.pedestrianQueueTimeout);
+  clearTimeout(State.pedestrianWalkTimeout);
+  clearTimeout(State.pedestrianWarnTimeout);
+
+  State.timedTimeout = null;
+  State.transitionTimeout = null;
+  State.pedestrianQueueTimeout = null;
+  State.pedestrianWalkTimeout = null;
+  State.pedestrianWarnTimeout = null;
+>>>>>>> pedestrian-logic
 }
 
 function runManualTransition(callback) {
@@ -137,6 +186,11 @@ function startTimedMode() {
   State.ew = 'stop';
   renderAll();
 
+<<<<<<< HEAD
+=======
+  setPedestrianStatus("DON'T WALK", '#ef4444', false);
+
+>>>>>>> pedestrian-logic
   log(`⏱ Timed mode started — N–S: ${nsSeconds}s | E–W: ${ewSeconds}s`, 'info');
   log('✅ N–S is GO — E–W is STOP', 'success');
 
@@ -145,6 +199,10 @@ function startTimedMode() {
 
 function runTimedCycle(nsSeconds, ewSeconds) {
   if (State.mode !== 'timed') return;
+<<<<<<< HEAD
+=======
+  if (State.pedestrianActive || State.pedestrianQueued) return;
+>>>>>>> pedestrian-logic
   if (!State.timedRunning) return;
 
   const currentGoTime = State.ns === 'go' ? nsSeconds : ewSeconds;
@@ -156,12 +214,92 @@ function runTimedCycle(nsSeconds, ewSeconds) {
   }, currentGoTime * 1000);
 }
 
+<<<<<<< HEAD
+=======
+function startPedestrianMode() {
+  if (State.mode !== 'timed') return;
+
+  if (!State.timedRunning) {
+    log('⚠ Start timed mode first before using pedestrian', 'warning');
+    return;
+  }
+
+  if (State.pedestrianActive || State.pedestrianQueued) return;
+
+  const queueSec = parseFloat(pedQueueInput.value) || 3;
+  const walkSec = parseFloat(pedWalkInput.value) || 3;
+
+  State.pedestrianQueued = true;
+
+  log(`🚶 Pedestrian requested — waiting ${queueSec} seconds`, 'warning');
+
+  if (State.ns === 'go' || State.ns === 'warning') {
+    State.resumeLane = 'ns';
+  } else {
+    State.resumeLane = 'ew';
+  }
+
+  setPedestrianStatus("DON'T WALK", '#ef4444', false);
+
+  State.pedestrianQueueTimeout = setTimeout(function () {
+    State.pedestrianQueued = false;
+    State.pedestrianActive = true;
+
+    clearTimeout(State.timedTimeout);
+    clearTimeout(State.transitionTimeout);
+
+    State.timedTimeout = null;
+    State.transitionTimeout = null;
+    State.transitioning = false;
+
+    State.ns = 'stop';
+    State.ew = 'stop';
+    renderAll();
+
+    setPedestrianStatus('WALK', '#22c55e', false);
+    log(`🚶 WALK signal active — pedestrians may cross for ${walkSec} seconds`, 'success');
+
+    State.pedestrianWalkTimeout = setTimeout(function () {
+      setPedestrianStatus('WALK FAST', '#f59e0b', true);
+      log(`⚠ WALK FAST — ${walkSec} seconds remaining warning phase`, 'warning');
+
+      State.pedestrianWarnTimeout = setTimeout(function () {
+        State.pedestrianActive = false;
+        setPedestrianStatus("DON'T WALK", '#ef4444', false);
+
+        if (State.resumeLane === 'ns') {
+          State.ns = 'go';
+          State.ew = 'stop';
+          log('✅ Resuming N–S after pedestrian', 'success');
+        } else {
+          State.ew = 'go';
+          State.ns = 'stop';
+          log('✅ Resuming E–W after pedestrian', 'success');
+        }
+
+        renderAll();
+        runTimedCycle(State.lastNsSeconds, State.lastEwSeconds);
+      }, walkSec * 1000);
+    }, walkSec * 1000);
+  }, queueSec * 1000);
+}
+
+>>>>>>> pedestrian-logic
 function stopTimedMode() {
   clearAllTimeouts();
 
   State.timedRunning = false;
+<<<<<<< HEAD
   State.transitioning = false;
 
+=======
+  State.pedestrianActive = false;
+  State.pedestrianQueued = false;
+  State.transitioning = false;
+
+  setPedestrianStatus("DON'T WALK", '#ef4444', false);
+
+>>>>>>> pedestrian-logic
   log('⏹ Timed mode stopped', 'warning');
 }
 
@@ -179,6 +317,11 @@ btnStartTimed.onclick = () => {
 
 btnStopTimed.onclick = () => stopTimedMode();
 
+<<<<<<< HEAD
+=======
+btnPedestrian.onclick = () => startPedestrianMode();
+
+>>>>>>> pedestrian-logic
 modeSlider.oninput = () => {
   if (modeSlider.value === '0') {
     State.mode = 'manual';
@@ -196,5 +339,9 @@ btnClearLog.onclick = () => {
 };
 
 renderAll();
+<<<<<<< HEAD
+=======
+setPedestrianStatus("DON'T WALK", '#ef4444', false);
+>>>>>>> pedestrian-logic
 log('🚦 Traffic Simulator initialized', 'info');
 log('✅ E–W is GO — N–S is STOP', 'success');

@@ -13,7 +13,11 @@
         <p class="eyebrow">Traffic Management Dashboard</p>
         <h1>🚦 Smart Traffic Intersection Simulator</h1>
       </div>
+<<<<<<< HEAD
       <div class="status-chip">Manual + Timed</div>
+=======
+      <div class="status-chip">Manual + Timed + Pedestrian Logic</div>
+>>>>>>> pedestrian-logic
     </header>
 
     <main class="dashboard-grid">
@@ -25,7 +29,11 @@
           </div>
         </div>
 
+<<<<<<< HEAD
         <div class="intersection-stage main-stage">
+=======
+        <div class="intersection-stage pedestrian-stage">
+>>>>>>> pedestrian-logic
           <article class="lane-card">
             <div class="lane-header">
               <div>
@@ -43,9 +51,16 @@
             <div class="lane-state" id="ns-state-text">STOP</div>
           </article>
 
+<<<<<<< HEAD
           <article class="center-card">
             <div class="center-symbol">✚</div>
             <div class="center-label">Intersection</div>
+=======
+          <article class="pedestrian-card">
+            <div class="walk-icon">🚶</div>
+            <div class="walk-label">Pedestrian</div>
+            <div class="walk-status" id="pedestrian-status">DON'T WALK</div>
+>>>>>>> pedestrian-logic
           </article>
 
           <article class="lane-card">
@@ -101,6 +116,23 @@
               <button class="btn btn-success" id="btn-start-timed">Start</button>
               <button class="btn btn-danger" id="btn-stop-timed">Stop</button>
             </div>
+<<<<<<< HEAD
+=======
+
+            <div class="control-panel-row pedestrian-controls">
+              <label class="field">
+                <span>Queue (sec)</span>
+                <input type="text" id="ped-queue" value="3" placeholder="3" />
+              </label>
+
+              <label class="field">
+                <span>Walk (sec)</span>
+                <input type="text" id="ped-walk" value="3" placeholder="3" />
+              </label>
+
+              <button class="btn btn-warning" id="btn-pedestrian">Pedestrian</button>
+            </div>
+>>>>>>> pedestrian-logic
           </div>
         </section>
       </section>

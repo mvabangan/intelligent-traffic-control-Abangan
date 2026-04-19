@@ -76,7 +76,11 @@ body {
 .log-card,
 .control-card,
 .lane-card,
+<<<<<<< HEAD
 .center-card {
+=======
+.pedestrian-card {
+>>>>>>> pedestrian-logic
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -95,7 +99,11 @@ body {
   margin-bottom: 18px;
 }
 
+<<<<<<< HEAD
 .main-stage {
+=======
+.pedestrian-stage {
+>>>>>>> pedestrian-logic
   display: grid;
   grid-template-columns: 1fr 180px 1fr;
   gap: 18px;
@@ -104,7 +112,11 @@ body {
 }
 
 .lane-card,
+<<<<<<< HEAD
 .center-card {
+=======
+.pedestrian-card {
+>>>>>>> pedestrian-logic
   padding: 18px;
 }
 
@@ -164,7 +176,11 @@ body {
   letter-spacing: 0.08em;
 }
 
+<<<<<<< HEAD
 .center-card {
+=======
+.pedestrian-card {
+>>>>>>> pedestrian-logic
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,7 +189,11 @@ body {
   text-align: center;
 }
 
+<<<<<<< HEAD
 .center-symbol {
+=======
+.walk-icon {
+>>>>>>> pedestrian-logic
   width: 100px;
   height: 100px;
   border-radius: 24px;
@@ -185,13 +205,46 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
 }
 
+<<<<<<< HEAD
 .center-label {
+=======
+.walk-label {
+>>>>>>> pedestrian-logic
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.76rem;
 }
 
+<<<<<<< HEAD
+=======
+.walk-status {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #0d1323;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  min-width: 140px;
+  text-align: center;
+}
+
+.walk-status.flash {
+  animation: flashWarn 0.6s linear infinite;
+}
+
+@keyframes flashWarn {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+>>>>>>> pedestrian-logic
 .control-card {
   padding: 18px;
 }
@@ -274,6 +327,10 @@ body {
 .btn-primary { background: var(--blue); color: white; }
 .btn-success { background: var(--green); color: #08120c; }
 .btn-danger { background: var(--red); color: white; }
+<<<<<<< HEAD
+=======
+.btn-warning { background: #f59e0b; color: #1d1302; }
+>>>>>>> pedestrian-logic
 .btn-ghost { background: #202943; color: #d7def6; }
 
 .hidden {
@@ -312,7 +369,11 @@ body {
     grid-template-columns: 1fr;
   }
 
+<<<<<<< HEAD
   .main-stage {
+=======
+  .pedestrian-stage {
+>>>>>>> pedestrian-logic
     grid-template-columns: 1fr;
   }
 }
