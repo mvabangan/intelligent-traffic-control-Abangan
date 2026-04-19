@@ -120,6 +120,22 @@ body {
   font-size: 0.85rem;
 }
 
+.lane-timer,
+.ped-timer {
+  min-width: 62px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: #0d1323;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #d7def6;
+}
+
 .traffic-light.vertical {
   width: 108px;
   margin: 0 auto;
@@ -210,12 +226,8 @@ body {
 }
 
 @keyframes flashWarn {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
 }
 
 .control-card {
@@ -342,4 +354,19 @@ body {
   .pedestrian-stage {
     grid-template-columns: 1fr;
   }
+}
+
+.lane-timer.go,
+.ped-timer.go {
+  color: #22c55e;
+}
+
+.lane-timer.stop,
+.ped-timer.stop {
+  color: #ef4444;
+}
+
+.lane-timer.warning,
+.ped-timer.warning {
+  color: #f59e0b;
 }
