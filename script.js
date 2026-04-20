@@ -19,7 +19,6 @@ const ewStateText = $('ew-state-text');
 
 const pedestrianStatus = $('pedestrian-status');
 
-
 const nsCountdown = $('ns-countdown');
 const ewCountdown = $('ew-countdown');
 const pedestrianCountdown = $('pedestrian-countdown');
@@ -34,7 +33,6 @@ const nsTimeInput = $('ns-time');
 const ewTimeInput = $('ew-time');
 const pedQueueInput = $('ped-queue');
 const pedWalkInput = $('ped-walk');
-
 
 const modeSlider = $('mode-slider');
 const manualControls = $('manual-controls');
@@ -56,7 +54,6 @@ const State = {
 
   timedTimeout: null,
   timedRunning: false,
-
 
   pedestrianActive: false,
   pedestrianQueued: false,
@@ -88,6 +85,27 @@ function log(message, type = 'info') {
   }
 }
 
+function sendStateToAPI() {
+  fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: JSON.stringify({
+      ns: State.ns,
+      ew: State.ew,
+      mode: State.mode
+    }),
+    headers: {
+      'Content-type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then(() => {
+      log('🌐 State sent to API', 'info');
+    })
+    .catch(() => {
+      log('❌ API request failed', 'danger');
+    });
+}
+
 function renderLight(lights, stateText, state) {
   lights.red.classList.remove('active');
   lights.yellow.classList.remove('active');
@@ -112,7 +130,6 @@ function renderAll() {
   renderLight(nsLights, nsStateText, State.ns);
   renderLight(ewLights, ewStateText, State.ew);
 }
-
 
 function setPedestrianStatus(text, color = '#ef4444', flashing = false) {
   pedestrianStatus.textContent = text;
@@ -191,6 +208,7 @@ function runManualTransition(callback) {
   }
 
   renderAll();
+  sendStateToAPI();
 
   function updateWarningCountdown() {
     if (nsActive) {
@@ -225,6 +243,7 @@ function runManualTransition(callback) {
     }
 
     renderAll();
+    sendStateToAPI();
 
     if (State.mode !== 'timed') {
       setLaneCountdowns('-', '-', 'stop', 'stop');
@@ -251,7 +270,7 @@ function startTimedMode() {
   State.ns = 'go';
   State.ew = 'stop';
   renderAll();
-
+  sendStateToAPI();
 
   setPedestrianStatus("DON'T WALK", '#ef4444', false);
   setPedCountdown('-', 'stop');
@@ -354,6 +373,7 @@ function startPedestrianMode() {
     State.ns = 'stop';
     State.ew = 'stop';
     renderAll();
+    sendStateToAPI();
     setLaneCountdowns(walkSec + walkSec, walkSec + walkSec, 'stop', 'stop');
 
     setPedestrianStatus('WALK', '#22c55e', false);
@@ -411,6 +431,7 @@ function startPedestrianMode() {
         }
 
         renderAll();
+        sendStateToAPI();
         runTimedCycle(State.lastNsSeconds, State.lastEwSeconds);
       }, walkSec * 1000);
     }, walkSec * 1000);
@@ -430,6 +451,7 @@ function stopTimedMode() {
   setLaneCountdowns('-', '-', 'stop', 'stop');
 
   log('⏹ Timed mode stopped', 'warning');
+  sendStateToAPI();
 }
 
 btnTransition.onclick = () => runManualTransition();
@@ -465,6 +487,8 @@ modeSlider.oninput = () => {
     manualControls.classList.add('hidden');
     timedControls.classList.remove('hidden');
   }
+
+  sendStateToAPI();
 };
 
 btnClearLog.onclick = () => {
